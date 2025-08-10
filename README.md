@@ -44,10 +44,6 @@ It allows you to upload system prompts, multiple input prompts, tweak generation
 ## 📦 Installation
 
 1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/gemini-prompt-tester.git
-   cd gemini-prompt-tester
-   ```
 
 2. **Create Virtual Environment (Optional but Recommended)**
    ```bash
