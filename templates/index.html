@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Prompt Tester</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Add specific styles for the table */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top; /* Align content to the top */
+        }
+
+        .results-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .results-table pre {
+            margin: 0; /* Remove default margin for pre in table cell */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gemini Prompt Tester</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form action="/" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="api_key">Gemini API Key:</label>
+                <input type="password" id="api_key" name="api_key" required placeholder="Enter your Gemini API key">
+            </div>
+
+            <div class="form-group">
+                <label for="gemini_model">Choose Gemini Model:</label>
+                <select id="gemini_model" name="gemini_model">
+                    {% for model in gemini_models %}
+                        <option value="{{ model }}" {% if model == selected_model %}selected{% endif %}>{{ model }}</option>
+                    {% endfor %}
+                </select>
+                <small>Select the Gemini model to use for generation.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="system_message_file">System Message (TXT file):</label>
+                <input type="file" id="system_message_file" name="system_message_file" accept=".txt">
+                <small>Upload a .txt file containing your system message (e.g., "You are a helpful AI assistant.").</small>
+            </div>
+
+            <div class="form-group">
+                <label for="input_message_files">Input Messages (TXT files):</label>
+                <input type="file" id="input_message_files" name="input_message_files" accept=".txt" multiple required>
+                <small>Upload one or more .txt files for your input prompts. Each file will be treated as a separate turn in the conversation.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="temperature">Temperature (0.0 - 2.0):</label>
+                <input type="number" id="temperature" name="temperature" step="0.01" min="0" max="2" value="0">
+                <small>Controls the randomness of the output. Higher values are more creative.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="top_p">Top P (0.0 - 1.0):</label>
+                <input type="number" id="top_p" name="top_p" step="0.01" min="0" max="1" value="0.95">
+                <small>Controls the diversity of the output. Filters tokens based on cumulative probability.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="top_k">Top K (Integer):</label>
+                <input type="number" id="top_k" name="top_k" step="1" min="1" value="64">
+                <small>Considers the top K most likely tokens.</small>
+            </div>
+
+            <button type="submit">Run Gemini</button>
+        </form>
+
+        {% if results_table_data %}
+            <h2>Gemini Results:</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Input</th>
+                        <th>Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in results_table_data %}
+                        <tr>
+                            <td><pre>{{ item.input }}</pre></td>
+                            <td><pre>{{ item.output }}</pre></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</body>
+</html>
